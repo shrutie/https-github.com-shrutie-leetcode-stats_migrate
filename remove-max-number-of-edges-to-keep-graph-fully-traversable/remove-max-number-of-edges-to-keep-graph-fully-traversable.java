@@ -1,36 +1,36 @@
 class Solution {
-
     public int maxNumEdgesToRemove(int n, int[][] edges) {
-               
+       
         UnionFind alice = new UnionFind(n);
         UnionFind bob = new UnionFind(n);
-        int count =0;
-        
+        int connected =0;        
         Arrays.sort(edges, (a,b) -> b[0]-a[0]);
+        
         for(int[] edge: edges){
-           int type = edge[0];
+            int type = edge[0];
             int u = edge[1];
             int v = edge[2];
             switch(type){
-                case 3 :
+                case 3: 
                     if(alice.union(u,v) | bob.union(u,v)){
-                        count++;
+                        connected++;
                     }
-                    break;
+                break;
                 case 2:
                     if(bob.union(u,v)){
-                        count++;
+                        connected++;
                     }
-                    break;
-                case 1: 
+                break;
+                case 1 :
                     if(alice.union(u,v)){
-                        count++;
+                        connected++;
                     }
-                    break;
-            } 
+                break;
+            }
         }
-       return (alice.getCount() && bob.getCount()) ? edges.length-count : -1;
-       
+        
+        return (alice.getCount() && bob.getCount()) ? edges.length-connected : -1;
+        
     }
 }
 
@@ -39,16 +39,18 @@ class UnionFind{
     int count;
     
     public UnionFind(int n){
-        
         parent = new int[n+1];
-        count = n;
+        count =n;
+        
         for(int i=0;i<=n;i++){
             parent[i] = i;
         }
     }
+    
     public boolean union(int x, int y){
         int parX = find(x);
         int parY = find(y);
+        
         if(parX != parY){
             parent[parX] = y;
             count--;
@@ -58,12 +60,10 @@ class UnionFind{
     }
     
     public int find(int x){
-        //System.out.println(parent[0]);
         if(parent[x] != x){
-           parent[x] = find(parent[x]);
+            parent[x] = find(parent[x]);
         }
-
-        return parent[x];
+        return parent[x]; 
     }
     
     public boolean getCount(){
