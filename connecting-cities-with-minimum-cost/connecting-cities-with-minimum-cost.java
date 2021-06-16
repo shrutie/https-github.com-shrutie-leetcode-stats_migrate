@@ -1,61 +1,56 @@
 class Solution {
-    int parent[];
-    int cities;
-    
-    private void union(int x, int y){
-        int parX = find(x);
-        int parY = find(y);
-        
-        if(parX != parY) {
-            parent[parX] = parY;
-            cities--;
-        }
-    }
-    
-    private int find(int x){
-        //if the parent is city itself
-        if(parent[x] == x){
-            return x;
-        }
-        //if not, find the parent =, when you send parent[x] : path comression
-        parent[x] = find(parent[x]);
-        return parent[x];
-        
-    }
-    
     public int minimumCost(int n, int[][] connections) {
-        parent = new int[n+1];
-        cities =n;
-        int cost =0; 
         
-        //assigning all the parents to itself
-        for(int i=0;i<=n;i++){
-            parent[i] = i;
-        }
-        
-        //sort by the cost now, and process one by one
+        UnionFind uf = new UnionFind(n);
+        int sum =0;
         Arrays.sort(connections, (a,b) -> a[2]-b[2]);
         
-        for(int[] conn: connections){
-            int A = conn[0];
-            int B = conn[1];
-            int costAB = conn[2];
-            
-            int parA = find(A);
-            int parB = find(B);
-            
-            //okay if A and B have different parents, they're not connected right, union them and add thier cost to the final result
-            if(parA != parB){
-                cost += costAB;
-                union(A,B);
+        for(int[] con : connections){
+            int x = con[0];
+            int y = con[1];
+            int cost = con[2];
+            int parX = uf.find(x);
+            int parY = uf.find(y);
+            if(parX != parY){
+                uf.union(x,y);
+                sum+= cost;
             }
-            
         }
-        /*while doing union the number of unreachable cities are reduced, at the end there
-        should be one city left which is the parent of all cities, much like the source,
-        if not then there cannot be a path honey!
-        */
-        return (cities == 1) ? cost: -1;
         
+        return (uf.getCount() == 1) ? sum : -1;
+    }
+    
+    class UnionFind{
+        int[] parent;
+        int count;
+        
+        public UnionFind(int n){
+            this.parent = new int[n+1];
+            this.count =n;
+            for(int i=0;i<=n;i++){
+                parent[i] = i;
+            }
+        }
+        
+        int find(int x){
+            if(x != parent[x]){
+                parent[x] = find(parent[x]);
+            }
+            return parent[x];
+        }
+        
+        void union(int x, int y){
+            int parX = find(x);
+            int parY = find(y);
+            
+            if(parX != parY){
+                parent[parX] = parY;
+                count --;
+            }
+        }
+        
+        int getCount(){
+            return this.count;
+        }
     }
 }
